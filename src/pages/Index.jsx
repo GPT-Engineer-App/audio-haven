@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 
 const PodcastCard = ({ title, author, tags, avatar }) => (
   <div className="bg-white p-4 rounded-lg shadow-md">
-    <div className="flex items-center mb-2">
-      <img src={avatar} alt={author} className="w-10 h-10 rounded-full mr-2" />
+    <div className="flex mb-2">
+      <img src={avatar} alt={author} className="w-30 h-10 object-cover mr-2" />
       <div>
         <h3 className="font-semibold">{title}</h3>
         <p className="text-sm text-gray-600">{author}</p>
@@ -17,7 +17,7 @@ const PodcastCard = ({ title, author, tags, avatar }) => (
         <span key={index} className="bg-gray-200 text-xs px-2 py-1 rounded mr-1 mb-1">#{tag}</span>
       ))}
     </div>
-    <div className="flex justify-between">
+    <div className="flex space-x-2">
       <Button variant="outline" size="sm">
         <Headphones className="w-4 h-4 mr-1" />
         Listen
