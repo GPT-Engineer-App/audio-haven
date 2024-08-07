@@ -6,7 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 const VolumeControl = ({ volume, setVolume }) => {
   return (
     <div className="flex items-center space-x-2">
-      <Volume2 className="w-4 h-4" />
+      <Volume2 className="w-5 h-5" />
       <Slider
         value={[volume * 100]}
         max={100}
@@ -201,7 +201,6 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           </Button>
         </div>
         <div className="flex items-center space-x-2 flex-1 justify-end">
-          <VolumeControl volume={volume} setVolume={setVolume} />
           <Button variant="ghost" size="icon" onClick={onFavorite}>
             <Star className={`w-5 h-5 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
           </Button>
@@ -216,16 +215,19 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           </Button>
         </div>
       </div>
-      <div className="flex items-center space-x-2">
-        <span className="text-sm">{formatTime(currentTime)}</span>
-        <Slider
-          value={[currentTime]}
-          max={duration}
-          step={1}
-          onValueChange={(value) => handleSeek(value[0])}
-          className="flex-1"
-        />
-        <span className="text-sm">{formatTime(duration)}</span>
+      <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2 flex-1">
+          <span className="text-sm">{formatTime(currentTime)}</span>
+          <Slider
+            value={[currentTime]}
+            max={duration}
+            step={1}
+            onValueChange={(value) => handleSeek(value[0])}
+            className="flex-1"
+          />
+          <span className="text-sm">{formatTime(duration)}</span>
+        </div>
+        <VolumeControl volume={volume} setVolume={setVolume} />
       </div>
       <audio
         ref={audioRef}
