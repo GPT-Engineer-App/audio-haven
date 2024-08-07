@@ -209,23 +209,12 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center flex-1">
           <img src={currentPodcast.avatar} alt={currentPodcast.author} className="w-12 h-12 rounded-full mr-3" />
-          <div>
-            <h3 className="font-semibold">{currentPodcast.title}</h3>
+          <div className="flex-1 mr-4">
+            <h3 className="font-semibold text-lg leading-tight">{currentPodcast.title}</h3>
             <p className="text-sm text-gray-600">{currentPodcast.author}</p>
           </div>
         </div>
-        <div className="flex items-center space-x-2 flex-1 justify-center">
-          <Button variant="ghost" size="icon" onClick={onPrevTrack}>
-            <SkipBack className="w-6 h-6" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={handlePlayPause}>
-            {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
-          </Button>
-          <Button variant="ghost" size="icon" onClick={onNextTrack}>
-            <SkipForward className="w-6 h-6" />
-          </Button>
-        </div>
-        <div className="flex items-center space-x-2 flex-1 justify-end">
+        <div className="flex items-center space-x-2 justify-end">
           <Button variant="ghost" size="icon" onClick={onFavorite}>
             <Star className={`w-5 h-5 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
           </Button>
@@ -240,7 +229,18 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           </Button>
         </div>
       </div>
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-4 mt-2">
+        <div className="flex items-center space-x-2">
+          <Button variant="ghost" size="icon" onClick={onPrevTrack} className="text-black">
+            <SkipBack className="w-6 h-6" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={handlePlayPause} className="text-black">
+            {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onNextTrack} className="text-black">
+            <SkipForward className="w-6 h-6" />
+          </Button>
+        </div>
         <div className="flex items-center space-x-2 flex-1">
           <span className="text-sm whitespace-nowrap">
             {formatTime(currentTime)} / {formatTime(duration)}
