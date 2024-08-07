@@ -58,13 +58,10 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md h-[200px] flex flex-col relative">
-      <Button variant="ghost" size="sm" className="absolute top-1 right-1 text-gray-400">
-        <Flag className="w-4 h-4" />
-      </Button>
       <div className="flex mb-2">
         <img src={avatar} alt={author} className="w-10 h-10 object-cover mr-2" />
-        <div className="overflow-hidden">
-          <h3 className="font-semibold whitespace-nowrap overflow-x-auto text-ellipsis">{title}</h3>
+        <div className="overflow-hidden flex-1">
+          <h3 className="font-semibold line-clamp-2">{title}</h3>
           <p className="text-sm text-gray-600">{author}</p>
         </div>
       </div>
@@ -73,15 +70,20 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite
           <span key={index} className="inline-block bg-gray-200 text-xs px-2 py-1 rounded mr-1 mb-1">#{tag}</span>
         ))}
       </div>
-      <div className="mt-auto flex justify-end space-x-2">
-        <Button variant="outline" size="sm" onClick={handlePlay}>
-          <Play className="w-4 h-4 mr-1" />
-          Play
+      <div className="mt-auto flex justify-between items-center">
+        <Button variant="ghost" size="sm" className="text-gray-400">
+          <Flag className="w-4 h-4" />
         </Button>
-        <Button variant="outline" size="sm" onClick={onFavorite}>
-          <Star className={`w-4 h-4 mr-1 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
-          {isFavorite ? 'Favorited' : 'Favorite'}
-        </Button>
+        <div className="flex space-x-2">
+          <Button variant="outline" size="sm" onClick={handlePlay}>
+            <Play className="w-4 h-4 mr-1" />
+            Play
+          </Button>
+          <Button variant="outline" size="sm" onClick={onFavorite}>
+            <Star className={`w-4 h-4 mr-1 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
+            {isFavorite ? 'Favorited' : 'Favorite'}
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -281,10 +283,10 @@ const Index = () => {
   // Removed unused volumeSliderStyles effect
 
   const allPodcasts = [
-    { title: "The Cutting Edge of Artificial Intelligence: Exploring Breakthroughs and Ethical Dilemmas", author: "Jane Doe", tags: ["technology", "AI", "ethics"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" },
-    { title: "Global Perspectives: Unraveling Complex Geopolitical Issues and Their Impact on International Relations", author: "John Smith", tags: ["news", "politics", "international"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-hip-hop-02-738.mp3" },
-    { title: "Quantum Realms and Beyond: Decoding the Mysteries of the Universe Through Modern Physics", author: "Dr. Brown", tags: ["science", "physics", "quantum"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-dreaming-big-31.mp3" },
-    { title: "Laughter Unleashed: A Deep Dive into the Psychology and Cultural Significance of Humor", author: "Laugh Co.", tags: ["comedy", "psychology", "culture"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-funny-circus-clowns-310.mp3" },
+    { title: "The Cutting Edge of Artificial Intelligence: Exploring Breakthroughs, Ethical Dilemmas, and the Future of Human-Machine Interaction in the Digital Age", author: "Jane Doe", tags: ["technology", "AI", "ethics"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" },
+    { title: "Global Perspectives: Unraveling Complex Geopolitical Issues and Their Impact on International Relations, Economic Policies, and Cultural Dynamics in the 21st Century", author: "John Smith", tags: ["news", "politics", "international"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-hip-hop-02-738.mp3" },
+    { title: "Quantum Realms and Beyond: Decoding the Mysteries of the Universe Through Modern Physics, String Theory, and the Search for a Unified Theory of Everything", author: "Dr. Brown", tags: ["science", "physics", "quantum"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-dreaming-big-31.mp3" },
+    { title: "Laughter Unleashed: A Deep Dive into the Psychology and Cultural Significance of Humor, Comedy, and Wit Across Different Societies and Historical Periods", author: "Laugh Co.", tags: ["comedy", "psychology", "culture"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-funny-circus-clowns-310.mp3" },
   ];
 
   const trendingPodcasts = allPodcasts.slice(0, 2);
