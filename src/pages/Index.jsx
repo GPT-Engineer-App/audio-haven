@@ -18,7 +18,7 @@ const VolumeControl = ({ volume, setVolume }) => {
         max={100}
         step={1}
         onValueChange={handleVolumeChange}
-        className="w-24"
+        className="w-16 sm:w-24 md:w-32"
       />
     </div>
   );
