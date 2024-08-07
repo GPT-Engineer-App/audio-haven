@@ -5,44 +5,18 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 const VolumeControl = ({ volume, setVolume }) => {
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Volume2 className="w-5 h-5" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" side="top">
-        <div className="p-2">
-          <Slider
-            orientation="vertical"
-            value={[volume * 100]}
-            max={100}
-            step={1}
-            onValueChange={(value) => setVolume(value[0] / 100)}
-            className="h-24 w-2"
-          />
-        </div>
-      </PopoverContent>
-    </Popover>
+    <div className="flex items-center space-x-2">
+      <Volume2 className="w-4 h-4" />
+      <Slider
+        value={[volume * 100]}
+        max={100}
+        step={1}
+        onValueChange={(value) => setVolume(value[0] / 100)}
+        className="w-24"
+      />
+    </div>
   );
 };
-
-// Add this CSS to ensure proper alignment and appearance
-const volumeSliderStyles = `
-  .volume-slider [data-orientation="vertical"] {
-    height: 100px;
-  }
-  .volume-slider [data-orientation="vertical"] [data-orientation="vertical"] {
-    height: 100%;
-    width: 3px;
-  }
-  .volume-slider [role="slider"] {
-    width: 100%;
-    height: 10px;
-    background-color: black;
-    border-radius: 0;
-  }
-`;
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -227,9 +201,7 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           </Button>
         </div>
         <div className="flex items-center space-x-2 flex-1 justify-end">
-          <div className="volume-slider">
-            <VolumeControl volume={volume} setVolume={setVolume} />
-          </div>
+          <VolumeControl volume={volume} setVolume={setVolume} />
           <Button variant="ghost" size="icon" onClick={onFavorite}>
             <Star className={`w-5 h-5 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
           </Button>
@@ -278,16 +250,7 @@ const Index = () => {
   const [voiceType, setVoiceType] = useState('male');
   const [showCaptions, setShowCaptions] = useState(false);
 
-  useEffect(() => {
-    // Add the volume slider styles to the document
-    const styleElement = document.createElement('style');
-    styleElement.textContent = volumeSliderStyles;
-    document.head.appendChild(styleElement);
-
-    return () => {
-      document.head.removeChild(styleElement);
-    };
-  }, []);
+  // Removed unused volumeSliderStyles effect
 
   const allPodcasts = [
     { title: "Tech Talk", author: "Jane Doe", tags: ["technology", "news"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" },
