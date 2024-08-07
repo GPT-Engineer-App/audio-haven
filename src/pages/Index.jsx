@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FacebookShareButton, TwitterShareButton, LinkedinShareButton } from 'react-share';
-import { useState, useEffect, useRef } from 'react';
 
 const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite, isFavorite }) => (
   <div className="bg-white p-4 rounded-lg shadow-md h-[200px] flex flex-col relative">
