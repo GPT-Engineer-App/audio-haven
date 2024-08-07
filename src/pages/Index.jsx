@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, Headphones, Star, Flag, Play, Pause, SkipBack, SkipForward, Share2, Settings, Volume2 } from 'lucide-react';
+import { Search, Headphones, Star, Flag, Play, Pause, SkipBack, SkipForward, Share2, Settings, Volume2, Rewind, FastForward } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
@@ -40,7 +40,7 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite
   </div>
 );
 
-const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShare, onSettings }) => {
+const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShare, onSettings, onPrevTrack, onNextTrack }) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const audioRef = useRef(null);
 
@@ -54,10 +54,39 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
     }
   }, [isPlaying, currentPodcast]);
 
+  useEffect(() => {
+    const handlePlay = () => {
+      document.querySelectorAll('audio').forEach(audio => {
+        if (audio !== audioRef.current.audio.current) {
+          audio.pause();
+        }
+      });
+    };
+
+    const audioElement = audioRef.current.audio.current;
+    audioElement.addEventListener('play', handlePlay);
+
+    return () => {
+      audioElement.removeEventListener('play', handlePlay);
+    };
+  }, []);
+
   if (!currentPodcast) return null;
 
   const handlePlay = () => setIsPlaying(true);
   const handlePause = () => setIsPlaying(false);
+
+  const handleSkipForward = () => {
+    if (audioRef.current) {
+      audioRef.current.audio.current.currentTime += 10;
+    }
+  };
+
+  const handleSkipBackward = () => {
+    if (audioRef.current) {
+      audioRef.current.audio.current.currentTime -= 10;
+    }
+  };
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4">
@@ -98,14 +127,24 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           "DURATION",
         ]}
         customControlsSection={[
+          <Button key="prev" variant="ghost" size="icon" onClick={onPrevTrack}>
+            <SkipBack className="w-6 h-6" />
+          </Button>,
           "MAIN_CONTROLS",
+          <Button key="next" variant="ghost" size="icon" onClick={onNextTrack}>
+            <SkipForward className="w-6 h-6" />
+          </Button>,
+          <Button key="rewind" variant="ghost" size="icon" onClick={handleSkipBackward}>
+            <Rewind className="w-6 h-6" />
+          </Button>,
+          <Button key="forward" variant="ghost" size="icon" onClick={handleSkipForward}>
+            <FastForward className="w-6 h-6" />
+          </Button>,
           "VOLUME_CONTROLS",
         ]}
         customIcons={{
           play: <Play className="w-6 h-6" />,
           pause: <Pause className="w-6 h-6" />,
-          rewind: <SkipBack className="w-6 h-6" />,
-          forward: <SkipForward className="w-6 h-6" />,
           volume: <Volume2 className="w-6 h-6" />,
         }}
       />
@@ -125,22 +164,37 @@ const Index = () => {
   const [voiceType, setVoiceType] = useState('male');
   const [showCaptions, setShowCaptions] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentPodcastIndex, setCurrentPodcastIndex] = useState(0);
 
   const audioRef = useRef(null);
 
-  const trendingPodcasts = [
+  const allPodcasts = [
     { title: "Tech Talk", author: "Jane Doe", tags: ["technology", "news"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" },
     { title: "Daily Digest", author: "John Smith", tags: ["news", "politics"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-hip-hop-02-738.mp3" },
-  ];
-
-  const topRatedPodcasts = [
     { title: "Science Hour", author: "Dr. Brown", tags: ["science", "education"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-dreaming-big-31.mp3" },
     { title: "Comedy Central", author: "Laugh Co.", tags: ["comedy", "entertainment"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-funny-circus-clowns-310.mp3" },
   ];
 
+  const trendingPodcasts = allPodcasts.slice(0, 2);
+  const topRatedPodcasts = allPodcasts.slice(2);
+
   const handlePlay = (podcast) => {
+    const index = allPodcasts.findIndex(p => p.title === podcast.title);
+    setCurrentPodcastIndex(index);
     setCurrentPodcast(podcast);
     setIsPlaying(true);
+  };
+
+  const handlePrevTrack = () => {
+    const newIndex = (currentPodcastIndex - 1 + allPodcasts.length) % allPodcasts.length;
+    setCurrentPodcastIndex(newIndex);
+    setCurrentPodcast(allPodcasts[newIndex]);
+  };
+
+  const handleNextTrack = () => {
+    const newIndex = (currentPodcastIndex + 1) % allPodcasts.length;
+    setCurrentPodcastIndex(newIndex);
+    setCurrentPodcast(allPodcasts[newIndex]);
   };
 
   const handleFavorite = (podcast) => {
@@ -233,6 +287,8 @@ const Index = () => {
           isFavorite={favorites.some(fav => fav.title === currentPodcast.title)}
           onShare={handleShare}
           onSettings={handleSettings}
+          onPrevTrack={handlePrevTrack}
+          onNextTrack={handleNextTrack}
         />
       )}
 
