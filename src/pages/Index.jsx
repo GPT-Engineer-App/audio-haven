@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
 import { FacebookShareButton, TwitterShareButton, LinkedinShareButton } from 'react-share';
 
 const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite, isFavorite }) => (
@@ -133,6 +134,11 @@ const Index = () => {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [currentPodcastIndex, setCurrentPodcastIndex] = useState(0);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [timbre, setTimbre] = useState(50);
+  const [prosody, setProsody] = useState(50);
+  const [voiceType, setVoiceType] = useState('male');
+  const [showCaptions, setShowCaptions] = useState(false);
 
   const allPodcasts = [
     { title: "Tech Talk", author: "Jane Doe", tags: ["technology", "news"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" },
@@ -291,6 +297,7 @@ const Index = () => {
                 max={2}
                 min={0.5}
                 step={0.1}
+                className="w-full"
               />
               <span className="text-sm text-gray-500">{playbackSpeed}x</span>
             </div>
