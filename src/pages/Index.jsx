@@ -162,6 +162,16 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           </div>
         </div>
         <div className="flex items-center space-x-2 flex-1 justify-center">
+          <div className="flex items-center mr-4">
+            <Volume2 className="w-4 h-4 mr-2" />
+            <Slider
+              value={[volume * 100]}
+              max={100}
+              step={1}
+              onValueChange={(value) => setVolume(value[0] / 100)}
+              className="w-20"
+            />
+          </div>
           <Button variant="ghost" size="icon" onClick={onPrevTrack}>
             <SkipBack className="w-6 h-6" />
           </Button>
@@ -197,16 +207,6 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           className="flex-1"
         />
         <span className="text-sm">{formatTime(duration)}</span>
-      </div>
-      <div className="flex items-center mt-2">
-        <Volume2 className="w-5 h-5 mr-2" />
-        <Slider
-          value={[volume * 100]}
-          max={100}
-          step={1}
-          onValueChange={(value) => setVolume(value[0] / 100)}
-          className="w-24"
-        />
       </div>
       <audio
         ref={audioRef}
@@ -254,17 +254,22 @@ const Index = () => {
     }, 0);
   };
 
-  const handlePrevTrack = () => {
-    const newIndex = (currentPodcastIndex - 1 + allPodcasts.length) % allPodcasts.length;
+  const handleTrackChange = (direction) => {
+    const newIndex = direction === 'next'
+      ? (currentPodcastIndex + 1) % allPodcasts.length
+      : (currentPodcastIndex - 1 + allPodcasts.length) % allPodcasts.length;
     setCurrentPodcastIndex(newIndex);
     setCurrentPodcast(allPodcasts[newIndex]);
+    setTimeout(() => {
+      const audioPlayer = document.querySelector('audio');
+      if (audioPlayer) {
+        audioPlayer.play().catch(error => console.error('Error playing audio:', error));
+      }
+    }, 0);
   };
 
-  const handleNextTrack = () => {
-    const newIndex = (currentPodcastIndex + 1) % allPodcasts.length;
-    setCurrentPodcastIndex(newIndex);
-    setCurrentPodcast(allPodcasts[newIndex]);
-  };
+  const handlePrevTrack = () => handleTrackChange('prev');
+  const handleNextTrack = () => handleTrackChange('next');
 
   const handleFavorite = (podcast) => {
     setFavorites(prevFavorites => {
