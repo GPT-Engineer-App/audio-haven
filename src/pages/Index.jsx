@@ -63,13 +63,15 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
       });
     };
 
-    const audioElement = audioRef.current.audio.current;
-    audioElement.addEventListener('play', handlePlay);
+    if (audioRef.current && audioRef.current.audio.current) {
+      const audioElement = audioRef.current.audio.current;
+      audioElement.addEventListener('play', handlePlay);
 
-    return () => {
-      audioElement.removeEventListener('play', handlePlay);
-    };
-  }, []);
+      return () => {
+        audioElement.removeEventListener('play', handlePlay);
+      };
+    }
+  }, [audioRef]);
 
   if (!currentPodcast) return null;
 
@@ -77,16 +79,33 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
   const handlePause = () => setIsPlaying(false);
 
   const handleSkipForward = () => {
-    if (audioRef.current) {
+    if (audioRef.current && audioRef.current.audio.current) {
       audioRef.current.audio.current.currentTime += 10;
     }
   };
 
   const handleSkipBackward = () => {
-    if (audioRef.current) {
+    if (audioRef.current && audioRef.current.audio.current) {
       audioRef.current.audio.current.currentTime -= 10;
     }
   };
+
+  const Skip10SecButton = ({ direction, onClick }) => (
+    <Button variant="ghost" size="icon" onClick={onClick} className="relative">
+      <div className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center">
+        <span className="text-xs font-bold">10</span>
+      </div>
+      {direction === 'forward' ? (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 absolute top-0 right-0">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      ) : (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 absolute top-0 left-0">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      )}
+    </Button>
+  );
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4">
@@ -119,7 +138,7 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
         src={currentPodcast.audioSrc}
         onPlay={handlePlay}
         onPause={handlePause}
-        showJumpControls={true}
+        showJumpControls={false}
         layout="stacked"
         customProgressBarSection={[
           "CURRENT_TIME",
@@ -127,6 +146,7 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           "DURATION",
         ]}
         customControlsSection={[
+          <Skip10SecButton key="backward" direction="backward" onClick={handleSkipBackward} />,
           <Button key="prev" variant="ghost" size="icon" onClick={onPrevTrack}>
             <SkipBack className="w-6 h-6" />
           </Button>,
@@ -134,12 +154,7 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           <Button key="next" variant="ghost" size="icon" onClick={onNextTrack}>
             <SkipForward className="w-6 h-6" />
           </Button>,
-          <Button key="rewind" variant="ghost" size="icon" onClick={handleSkipBackward}>
-            <Rewind className="w-6 h-6" />
-          </Button>,
-          <Button key="forward" variant="ghost" size="icon" onClick={handleSkipForward}>
-            <FastForward className="w-6 h-6" />
-          </Button>,
+          <Skip10SecButton key="forward" direction="forward" onClick={handleSkipForward} />,
           "VOLUME_CONTROLS",
         ]}
         customIcons={{
