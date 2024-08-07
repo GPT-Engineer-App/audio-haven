@@ -19,13 +19,29 @@ const VolumeControl = ({ volume, setVolume }) => {
             max={100}
             step={1}
             onValueChange={(value) => setVolume(value[0] / 100)}
-            className="h-24"
+            className="h-20"
           />
         </div>
       </PopoverContent>
     </Popover>
   );
 };
+
+// Add this CSS to ensure proper alignment and appearance
+const volumeSliderStyles = `
+  .volume-slider [data-orientation="vertical"] {
+    height: 100%;
+  }
+  .volume-slider [data-orientation="vertical"] [data-orientation="vertical"] {
+    height: 100%;
+    width: 3px;
+    background-color: black;
+  }
+  .volume-slider [role="slider"] {
+    left: 50% !important;
+    transform: translateX(-50%);
+  }
+`;
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -210,7 +226,9 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           </Button>
         </div>
         <div className="flex items-center space-x-2 flex-1 justify-end">
-          <VolumeControl volume={volume} setVolume={setVolume} />
+          <div className="volume-slider">
+            <VolumeControl volume={volume} setVolume={setVolume} />
+          </div>
           <Button variant="ghost" size="icon" onClick={onFavorite}>
             <Star className={`w-5 h-5 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
           </Button>
@@ -258,6 +276,17 @@ const Index = () => {
   const [prosody, setProsody] = useState(50);
   const [voiceType, setVoiceType] = useState('male');
   const [showCaptions, setShowCaptions] = useState(false);
+
+  useEffect(() => {
+    // Add the volume slider styles to the document
+    const styleElement = document.createElement('style');
+    styleElement.textContent = volumeSliderStyles;
+    document.head.appendChild(styleElement);
+
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
 
   const allPodcasts = [
     { title: "Tech Talk", author: "Jane Doe", tags: ["technology", "news"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" },
