@@ -208,15 +208,18 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onClose}
-        className="absolute top-1 right-1 p-1"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      </Button>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 mt-4">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-semibold text-lg">Now Playing</h3>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onClose}
+          className="p-1"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </Button>
+      </div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2">
         <div className="flex items-center flex-1 min-w-0">
           <img src={currentPodcast.avatar} alt={currentPodcast.author} className="w-12 h-12 rounded-full mr-3 flex-shrink-0" />
           <div className="flex-1 mr-4 min-w-0">
