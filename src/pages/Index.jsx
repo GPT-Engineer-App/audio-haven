@@ -172,9 +172,13 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
   };
 
   const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor((time % 3600) / 60);
     const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    if (hours > 0) {
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
   if (!currentPodcast) return null;
@@ -217,7 +221,9 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
       </div>
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-2 flex-1">
-          <span className="text-sm">{formatTime(currentTime)}</span>
+          <span className="text-sm whitespace-nowrap">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
           <Slider
             value={[currentTime]}
             max={duration}
@@ -225,7 +231,6 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
             onValueChange={(value) => handleSeek(value[0])}
             className="flex-1"
           />
-          <span className="text-sm">{formatTime(duration)}</span>
         </div>
         <VolumeControl volume={volume} setVolume={setVolume} />
       </div>
