@@ -26,7 +26,7 @@ const VolumeControl = ({ volume, setVolume }) => {
   return (
     <div className="flex items-center space-x-2">
       <Button variant="ghost" size="sm" onClick={toggleMute} className="p-0">
-        {volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+        {volume === 0 ? <VolumeX className="w-5 h-5 fill-current" /> : <Volume2 className="w-5 h-5 fill-current" />}
       </Button>
       <Slider
         value={[volume * 100]}
@@ -232,13 +232,13 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
       <div className="flex items-center space-x-4 mt-2">
         <div className="flex items-center space-x-2">
           <Button variant="ghost" size="icon" onClick={onPrevTrack} className="text-black">
-            <SkipBack className="w-6 h-6" />
+            <SkipBack className="w-6 h-6 fill-current" />
           </Button>
           <Button variant="ghost" size="icon" onClick={handlePlayPause} className="text-black">
-            {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+            {isPlaying ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current" />}
           </Button>
           <Button variant="ghost" size="icon" onClick={onNextTrack} className="text-black">
-            <SkipForward className="w-6 h-6" />
+            <SkipForward className="w-6 h-6 fill-current" />
           </Button>
         </div>
         <div className="flex items-center space-x-2 flex-1">
@@ -281,10 +281,10 @@ const Index = () => {
   // Removed unused volumeSliderStyles effect
 
   const allPodcasts = [
-    { title: "Tech Talk", author: "Jane Doe", tags: ["technology", "news"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" },
-    { title: "Daily Digest", author: "John Smith", tags: ["news", "politics"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-hip-hop-02-738.mp3" },
-    { title: "Science Hour", author: "Dr. Brown", tags: ["science", "education"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-dreaming-big-31.mp3" },
-    { title: "Comedy Central", author: "Laugh Co.", tags: ["comedy", "entertainment"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-funny-circus-clowns-310.mp3" },
+    { title: "The Cutting Edge of Artificial Intelligence: Exploring Breakthroughs and Ethical Dilemmas", author: "Jane Doe", tags: ["technology", "AI", "ethics"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" },
+    { title: "Global Perspectives: Unraveling Complex Geopolitical Issues and Their Impact on International Relations", author: "John Smith", tags: ["news", "politics", "international"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-hip-hop-02-738.mp3" },
+    { title: "Quantum Realms and Beyond: Decoding the Mysteries of the Universe Through Modern Physics", author: "Dr. Brown", tags: ["science", "physics", "quantum"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-dreaming-big-31.mp3" },
+    { title: "Laughter Unleashed: A Deep Dive into the Psychology and Cultural Significance of Humor", author: "Laugh Co.", tags: ["comedy", "psychology", "culture"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-funny-circus-clowns-310.mp3" },
   ];
 
   const trendingPodcasts = allPodcasts.slice(0, 2);
