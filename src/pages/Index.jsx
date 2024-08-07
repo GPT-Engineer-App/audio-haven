@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, Headphones, Star, Flag, Play, Pause, SkipBack, SkipForward, Share2, Settings, Volume2, Rewind, FastForward } from 'lucide-react';
+import { Search, Headphones, Star, Flag, Play, Pause, SkipBack, SkipForward, Share2, Settings, Volume2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -39,67 +38,49 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite
 );
 
 const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShare, onSettings, onPrevTrack, onNextTrack }) => {
-  const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.addEventListener('timeupdate', handleTimeUpdate);
-      audioRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
-      audioRef.current.addEventListener('ended', handleEnded);
-    }
+    if (!navigator.mediaSession) return;
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: currentPodcast.title,
+      artist: currentPodcast.author,
+      album: currentPodcast.tags.join(', '),
+      artwork: [{ src: currentPodcast.avatar, sizes: '512x512', type: 'image/svg+xml' }]
+    });
+
+    navigator.mediaSession.setActionHandler('play', () => playTrack());
+    navigator.mediaSession.setActionHandler('pause', () => pauseTrack());
+    navigator.mediaSession.setActionHandler('previoustrack', () => onPrevTrack());
+    navigator.mediaSession.setActionHandler('nexttrack', () => onNextTrack());
 
     return () => {
-      if (audioRef.current) {
-        audioRef.current.removeEventListener('timeupdate', handleTimeUpdate);
-        audioRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata);
-        audioRef.current.removeEventListener('ended', handleEnded);
-      }
+      navigator.mediaSession.setActionHandler('play', null);
+      navigator.mediaSession.setActionHandler('pause', null);
+      navigator.mediaSession.setActionHandler('previoustrack', null);
+      navigator.mediaSession.setActionHandler('nexttrack', null);
     };
-  }, [currentPodcast]);
+  }, [currentPodcast, onPrevTrack, onNextTrack]);
 
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.src = currentPodcast.audioSrc;
-      audioRef.current.play();
-    }
-  }, [currentPodcast]);
-
-  const handleTimeUpdate = () => {
-    setCurrentTime(audioRef.current.currentTime);
+  const playTrack = () => {
+    document.getElementById('audio-player').play();
+    setIsPlaying(true);
+    navigator.mediaSession.playbackState = "playing";
   };
 
-  const handleLoadedMetadata = () => {
-    setDuration(audioRef.current.duration);
-  };
-
-  const handleEnded = () => {
+  const pauseTrack = () => {
+    document.getElementById('audio-player').pause();
     setIsPlaying(false);
-    setCurrentTime(0);
+    navigator.mediaSession.playbackState = "paused";
   };
 
   const handlePlayPause = () => {
-    if (audioRef.current.paused) {
-      audioRef.current.play();
-      setIsPlaying(true);
+    if (isPlaying) {
+      pauseTrack();
     } else {
-      audioRef.current.pause();
-      setIsPlaying(false);
+      playTrack();
     }
-  };
-
-  const handleSeek = (e) => {
-    const seekTime = (e.nativeEvent.offsetX / e.target.offsetWidth) * duration;
-    audioRef.current.currentTime = seekTime;
-    setCurrentTime(seekTime);
-  };
-
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
   if (!currentPodcast) return null;
@@ -129,30 +110,18 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           </Button>
         </div>
       </div>
-      <div className="flex flex-col">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm">{formatTime(currentTime)}</span>
-          <span className="text-sm">{formatTime(duration)}</span>
-        </div>
-        <div className="w-full bg-gray-200 h-1 rounded-full cursor-pointer" onClick={handleSeek}>
-          <div
-            className="bg-blue-500 h-1 rounded-full"
-            style={{ width: `${(currentTime / duration) * 100}%` }}
-          ></div>
-        </div>
-        <div className="flex justify-center items-center mt-4">
-          <Button variant="ghost" size="icon" onClick={onPrevTrack}>
-            <SkipBack className="w-6 h-6" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={handlePlayPause}>
-            {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
-          </Button>
-          <Button variant="ghost" size="icon" onClick={onNextTrack}>
-            <SkipForward className="w-6 h-6" />
-          </Button>
-        </div>
+      <div className="flex justify-center items-center mt-4">
+        <Button variant="ghost" size="icon" onClick={onPrevTrack}>
+          <SkipBack className="w-6 h-6" />
+        </Button>
+        <Button variant="ghost" size="icon" onClick={handlePlayPause}>
+          {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+        </Button>
+        <Button variant="ghost" size="icon" onClick={onNextTrack}>
+          <SkipForward className="w-6 h-6" />
+        </Button>
       </div>
-      <audio ref={audioRef} />
+      <audio id="audio-player" src={currentPodcast.audioSrc} />
     </div>
   );
 };
@@ -163,15 +132,7 @@ const Index = () => {
   const [favorites, setFavorites] = useState([]);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1);
-  const [timbre, setTimbre] = useState(50);
-  const [prosody, setProsody] = useState(50);
-  const [voiceType, setVoiceType] = useState('male');
-  const [showCaptions, setShowCaptions] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [currentPodcastIndex, setCurrentPodcastIndex] = useState(0);
-
-  const audioRef = useRef(null);
 
   const allPodcasts = [
     { title: "Tech Talk", author: "Jane Doe", tags: ["technology", "news"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" },
@@ -187,18 +148,23 @@ const Index = () => {
     const index = allPodcasts.findIndex(p => p.title === podcast.title);
     setCurrentPodcastIndex(index);
     setCurrentPodcast(podcast);
+    document.getElementById('audio-player').play();
   };
 
   const handlePrevTrack = () => {
     const newIndex = (currentPodcastIndex - 1 + allPodcasts.length) % allPodcasts.length;
     setCurrentPodcastIndex(newIndex);
     setCurrentPodcast(allPodcasts[newIndex]);
+    document.getElementById('audio-player').src = allPodcasts[newIndex].audioSrc;
+    document.getElementById('audio-player').play();
   };
 
   const handleNextTrack = () => {
     const newIndex = (currentPodcastIndex + 1) % allPodcasts.length;
     setCurrentPodcastIndex(newIndex);
     setCurrentPodcast(allPodcasts[newIndex]);
+    document.getElementById('audio-player').src = allPodcasts[newIndex].audioSrc;
+    document.getElementById('audio-player').play();
   };
 
   const handleFavorite = (podcast) => {
