@@ -216,20 +216,6 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
             <p className="text-sm text-gray-600 truncate">{currentPodcast.author}</p>
           </div>
         </div>
-        <div className="flex items-center space-x-2 justify-end mt-2 sm:mt-0 ml-auto">
-          <Button variant="ghost" size="icon" onClick={onFavorite}>
-            <Star className={`w-5 h-5 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={onShare}>
-            <Share2 className="w-5 h-5" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={onSettings}>
-            <Settings className="w-5 h-5" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </Button>
-        </div>
       </div>
       <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 mt-2">
         <div className="flex items-center space-x-2">
@@ -241,6 +227,18 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           </Button>
           <Button variant="ghost" size="icon" onClick={onNextTrack} className="text-black">
             <SkipForward className="w-6 h-6 fill-current" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={onFavorite}>
+            <Star className={`w-4 h-4 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={onShare}>
+            <Share2 className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={onSettings}>
+            <Settings className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </Button>
         </div>
         <div className="flex items-center space-x-2 flex-1 w-full sm:w-auto">
