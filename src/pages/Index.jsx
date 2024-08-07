@@ -1,17 +1,37 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, Headphones, Star, Flag, Play, Pause, SkipBack, SkipForward, Share2, Settings, Volume2 } from 'lucide-react';
+import { Search, Headphones, Star, Flag, Play, Pause, SkipBack, SkipForward, Share2, Settings, Volume2, VolumeX } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const VolumeControl = ({ volume, setVolume }) => {
+  const [prevVolume, setPrevVolume] = useState(volume);
+
+  const handleVolumeChange = (value) => {
+    setVolume(value[0] / 100);
+    if (value[0] > 0) {
+      setPrevVolume(value[0] / 100);
+    }
+  };
+
+  const toggleMute = () => {
+    if (volume > 0) {
+      setPrevVolume(volume);
+      setVolume(0);
+    } else {
+      setVolume(prevVolume);
+    }
+  };
+
   return (
     <div className="flex items-center space-x-2">
-      <Volume2 className="w-5 h-5" />
+      <Button variant="ghost" size="sm" onClick={toggleMute} className="p-0">
+        {volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+      </Button>
       <Slider
         value={[volume * 100]}
         max={100}
         step={1}
-        onValueChange={(value) => setVolume(value[0] / 100)}
+        onValueChange={handleVolumeChange}
         className="w-24"
       />
     </div>
