@@ -69,32 +69,40 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
   }, [currentPodcast, onPrevTrack, onNextTrack]);
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.addEventListener('timeupdate', handleTimeUpdate);
-      audioRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
-      audioRef.current.addEventListener('ended', handleTrackEnded);
+    const audio = audioRef.current;
+    if (audio) {
+      audio.addEventListener('timeupdate', handleTimeUpdate);
+      audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.addEventListener('ended', handleTrackEnded);
     }
     return () => {
-      if (audioRef.current) {
-        audioRef.current.removeEventListener('timeupdate', handleTimeUpdate);
-        audioRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata);
-        audioRef.current.removeEventListener('ended', handleTrackEnded);
+      if (audio) {
+        audio.removeEventListener('timeupdate', handleTimeUpdate);
+        audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        audio.removeEventListener('ended', handleTrackEnded);
       }
     };
   }, []);
 
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = volume;
     }
   }, [volume]);
 
   const handleTimeUpdate = () => {
-    setCurrentTime(audioRef.current.currentTime);
+    const audio = audioRef.current;
+    if (audio) {
+      setCurrentTime(audio.currentTime);
+    }
   };
 
   const handleLoadedMetadata = () => {
-    setDuration(audioRef.current.duration);
+    const audio = audioRef.current;
+    if (audio) {
+      setDuration(audio.duration);
+    }
   };
 
   const handleTrackEnded = () => {
@@ -102,15 +110,21 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
   };
 
   const playTrack = () => {
-    audioRef.current.play();
-    setIsPlaying(true);
-    navigator.mediaSession.playbackState = "playing";
+    const audio = audioRef.current;
+    if (audio) {
+      audio.play().catch(error => console.error('Error playing audio:', error));
+      setIsPlaying(true);
+      navigator.mediaSession.playbackState = "playing";
+    }
   };
 
   const pauseTrack = () => {
-    audioRef.current.pause();
-    setIsPlaying(false);
-    navigator.mediaSession.playbackState = "paused";
+    const audio = audioRef.current;
+    if (audio) {
+      audio.pause();
+      setIsPlaying(false);
+      navigator.mediaSession.playbackState = "paused";
+    }
   };
 
   const handlePlayPause = () => {
@@ -122,8 +136,11 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
   };
 
   const handleSeek = (newTime) => {
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
+    const audio = audioRef.current;
+    if (audio) {
+      audio.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
   };
 
   const formatTime = (time) => {
