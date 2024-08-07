@@ -209,11 +209,11 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4">
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center flex-1">
-          <img src={currentPodcast.avatar} alt={currentPodcast.author} className="w-12 h-12 rounded-full mr-3" />
-          <div className="flex-1 mr-4">
-            <h3 className="font-semibold text-lg leading-tight">{currentPodcast.title}</h3>
-            <p className="text-sm text-gray-600">{currentPodcast.author}</p>
+        <div className="flex items-center flex-1 min-w-0">
+          <img src={currentPodcast.avatar} alt={currentPodcast.author} className="w-12 h-12 rounded-full mr-3 flex-shrink-0" />
+          <div className="flex-1 mr-4 min-w-0">
+            <h3 className="font-semibold text-lg leading-tight truncate">{currentPodcast.title}</h3>
+            <p className="text-sm text-gray-600 truncate">{currentPodcast.author}</p>
           </div>
         </div>
         <div className="flex items-center space-x-2 justify-end">
