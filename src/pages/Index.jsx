@@ -41,7 +41,17 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite
 );
 
 const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShare, onSettings }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+
   if (!currentPodcast) return null;
+
+  const handlePlay = () => {
+    setIsPlaying(true);
+  };
+
+  const handlePause = () => {
+    setIsPlaying(false);
+  };
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4">
@@ -69,7 +79,10 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
         </div>
       </div>
       <AudioPlayer
+        autoPlay
         src={currentPodcast.audioSrc}
+        onPlay={handlePlay}
+        onPause={handlePause}
         showJumpControls={true}
         layout="stacked"
         customProgressBarSection={[
@@ -97,6 +110,7 @@ const Index = () => {
   const [prosody, setProsody] = useState(50);
   const [voiceType, setVoiceType] = useState('male');
   const [showCaptions, setShowCaptions] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const audioRef = useRef(null);
 
@@ -112,6 +126,7 @@ const Index = () => {
 
   const handlePlay = (podcast) => {
     setCurrentPodcast(podcast);
+    setIsPlaying(true);
   };
 
   const handleFavorite = (podcast) => {
@@ -134,6 +149,7 @@ const Index = () => {
 
   const handleClosePlayer = () => {
     setCurrentPodcast(null);
+    setIsPlaying(false);
   };
 
   useEffect(() => {
