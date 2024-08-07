@@ -223,8 +223,8 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           </Button>
           <VolumeControl volume={volume} setVolume={setVolume} />
         </div>
-        <div className="flex items-center space-x-2 flex-1 w-full">
-          <span className="text-xs sm:text-sm whitespace-nowrap">
+        <div className="flex items-center space-x-2 sm:space-x-4 flex-1 w-full">
+          <span className="text-xs sm:text-sm whitespace-nowrap ml-0 sm:ml-4">
             {formatTime(currentTime)} / {formatTime(duration)}
           </span>
           <Slider
