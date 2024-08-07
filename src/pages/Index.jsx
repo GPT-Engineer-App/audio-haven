@@ -1,6 +1,31 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, Headphones, Star, Flag, Play, Pause, SkipBack, SkipForward, Share2, Settings, Volume2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
+const VolumeControl = ({ volume, setVolume }) => {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <Volume2 className="w-5 h-5" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" side="top">
+        <div className="p-2">
+          <Slider
+            orientation="vertical"
+            value={[volume * 100]}
+            max={100}
+            step={1}
+            onValueChange={(value) => setVolume(value[0] / 100)}
+            className="h-24"
+          />
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -8,35 +33,47 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { FacebookShareButton, TwitterShareButton, LinkedinShareButton } from 'react-share';
 
-const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite, isFavorite }) => (
-  <div className="bg-white p-4 rounded-lg shadow-md h-[200px] flex flex-col relative">
-    <Button variant="ghost" size="sm" className="absolute top-1 right-1 text-gray-400">
-      <Flag className="w-4 h-4" />
-    </Button>
-    <div className="flex mb-2">
-      <img src={avatar} alt={author} className="w-10 h-10 object-cover mr-2" />
-      <div className="overflow-hidden">
-        <h3 className="font-semibold whitespace-nowrap overflow-x-auto text-ellipsis">{title}</h3>
-        <p className="text-sm text-gray-600">{author}</p>
+const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite, isFavorite }) => {
+  const handlePlay = () => {
+    onPlay({ title, author, avatar, audioSrc });
+    setTimeout(() => {
+      const audioPlayer = document.querySelector('audio');
+      if (audioPlayer) {
+        audioPlayer.play().catch(error => console.error('Error playing audio:', error));
+      }
+    }, 0);
+  };
+
+  return (
+    <div className="bg-white p-4 rounded-lg shadow-md h-[200px] flex flex-col relative">
+      <Button variant="ghost" size="sm" className="absolute top-1 right-1 text-gray-400">
+        <Flag className="w-4 h-4" />
+      </Button>
+      <div className="flex mb-2">
+        <img src={avatar} alt={author} className="w-10 h-10 object-cover mr-2" />
+        <div className="overflow-hidden">
+          <h3 className="font-semibold whitespace-nowrap overflow-x-auto text-ellipsis">{title}</h3>
+          <p className="text-sm text-gray-600">{author}</p>
+        </div>
+      </div>
+      <div className="mb-2 overflow-x-auto whitespace-nowrap">
+        {tags.map((tag, index) => (
+          <span key={index} className="inline-block bg-gray-200 text-xs px-2 py-1 rounded mr-1 mb-1">#{tag}</span>
+        ))}
+      </div>
+      <div className="mt-auto flex justify-end space-x-2">
+        <Button variant="outline" size="sm" onClick={handlePlay}>
+          <Play className="w-4 h-4 mr-1" />
+          Play
+        </Button>
+        <Button variant="outline" size="sm" onClick={onFavorite}>
+          <Star className={`w-4 h-4 mr-1 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
+          {isFavorite ? 'Favorited' : 'Favorite'}
+        </Button>
       </div>
     </div>
-    <div className="mb-2 overflow-x-auto whitespace-nowrap">
-      {tags.map((tag, index) => (
-        <span key={index} className="inline-block bg-gray-200 text-xs px-2 py-1 rounded mr-1 mb-1">#{tag}</span>
-      ))}
-    </div>
-    <div className="mt-auto flex justify-end space-x-2">
-      <Button variant="outline" size="sm" onClick={() => onPlay({ title, author, avatar, audioSrc })}>
-        <Play className="w-4 h-4 mr-1" />
-        Play
-      </Button>
-      <Button variant="outline" size="sm" onClick={onFavorite}>
-        <Star className={`w-4 h-4 mr-1 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
-        {isFavorite ? 'Favorited' : 'Favorite'}
-      </Button>
-    </div>
-  </div>
-);
+  );
+};
 
 const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShare, onSettings, onPrevTrack, onNextTrack }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -162,16 +199,6 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           </div>
         </div>
         <div className="flex items-center space-x-2 flex-1 justify-center">
-          <div className="flex items-center mr-4">
-            <Volume2 className="w-4 h-4 mr-2" />
-            <Slider
-              value={[volume * 100]}
-              max={100}
-              step={1}
-              onValueChange={(value) => setVolume(value[0] / 100)}
-              className="w-20"
-            />
-          </div>
           <Button variant="ghost" size="icon" onClick={onPrevTrack}>
             <SkipBack className="w-6 h-6" />
           </Button>
@@ -183,6 +210,7 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           </Button>
         </div>
         <div className="flex items-center space-x-2 flex-1 justify-end">
+          <VolumeControl volume={volume} setVolume={setVolume} />
           <Button variant="ghost" size="icon" onClick={onFavorite}>
             <Star className={`w-5 h-5 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
           </Button>
