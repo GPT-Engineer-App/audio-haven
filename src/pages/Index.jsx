@@ -7,9 +7,10 @@ const VolumeControl = ({ volume, setVolume }) => {
   const [prevVolume, setPrevVolume] = useState(volume);
 
   const handleVolumeChange = (value) => {
-    setVolume(value[0] / 100);
-    if (value[0] > 0) {
-      setPrevVolume(value[0] / 100);
+    const newVolume = value[0] / 100;
+    setVolume(newVolume);
+    if (newVolume > 0) {
+      setPrevVolume(newVolume);
     }
   };
 
@@ -18,7 +19,7 @@ const VolumeControl = ({ volume, setVolume }) => {
       setPrevVolume(volume);
       setVolume(0);
     } else {
-      setVolume(prevVolume);
+      setVolume(prevVolume > 0 ? prevVolume : 0.5);
     }
   };
 
