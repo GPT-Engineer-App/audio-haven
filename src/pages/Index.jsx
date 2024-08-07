@@ -41,42 +41,33 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite
 );
 
 const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShare, onSettings, onPrevTrack, onNextTrack }) => {
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
 
   useEffect(() => {
     if (audioRef.current) {
+      const audioElement = audioRef.current.audio.current;
       if (isPlaying) {
-        audioRef.current.audio.current.play();
+        audioElement.play();
       } else {
-        audioRef.current.audio.current.pause();
+        audioElement.pause();
       }
     }
-  }, [isPlaying, currentPodcast]);
+  }, [isPlaying]);
 
   useEffect(() => {
-    const handlePlay = () => {
-      document.querySelectorAll('audio').forEach(audio => {
-        if (audio !== audioRef.current.audio.current) {
-          audio.pause();
-        }
-      });
+    return () => {
+      if (audioRef.current && audioRef.current.audio.current) {
+        audioRef.current.audio.current.pause();
+      }
     };
-
-    if (audioRef.current && audioRef.current.audio.current) {
-      const audioElement = audioRef.current.audio.current;
-      audioElement.addEventListener('play', handlePlay);
-
-      return () => {
-        audioElement.removeEventListener('play', handlePlay);
-      };
-    }
-  }, [audioRef]);
+  }, []);
 
   if (!currentPodcast) return null;
 
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
+  const handlePlayPause = () => {
+    setIsPlaying(!isPlaying);
+  };
 
   const handleSkipForward = () => {
     if (audioRef.current && audioRef.current.audio.current) {
@@ -93,12 +84,8 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
   const Skip10SecButton = ({ direction, onClick }) => (
     <Button variant="ghost" size="icon" onClick={onClick} className="relative">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-        <path d="M21 12a9 9 0 11-9-9" />
-        {direction === 'forward' ? (
-          <polyline points="15 3 21 3 21 9" />
-        ) : (
-          <polyline points="9 3 3 3 3 9" />
-        )}
+        <path d={direction === 'forward' ? "M21 12a9 9 0 11-6.219-8.56" : "M3 12a9 9 0 116.219-8.56"} />
+        <path d={direction === 'forward' ? "M12 7l3 3-3 3" : "M12 17l-3-3 3-3"} />
       </svg>
       <span className="absolute text-xs font-bold">{direction === 'forward' ? '+10' : '-10'}</span>
     </Button>
@@ -124,14 +111,14 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           <Button variant="ghost" size="icon" onClick={onSettings}>
             <Settings className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={() => { setIsPlaying(false); onClose(); }}>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </Button>
         </div>
       </div>
       <AudioPlayer
         ref={audioRef}
-        autoPlay
+        autoPlay={false}
         src={currentPodcast.audioSrc}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
@@ -150,7 +137,9 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
             <Skip10SecButton direction="backward" onClick={handleSkipBackward} />
             <Skip10SecButton direction="forward" onClick={handleSkipForward} />
           </div>,
-          RHAP_UI.MAIN_CONTROLS,
+          <Button key="play" variant="ghost" size="icon" onClick={handlePlayPause}>
+            {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+          </Button>,
           <Button key="next" variant="ghost" size="icon" onClick={onNextTrack}>
             <SkipForward className="w-6 h-6" />
           </Button>,
@@ -232,6 +221,9 @@ const Index = () => {
   const handleClosePlayer = () => {
     setCurrentPodcast(null);
     setIsPlaying(false);
+    if (audioRef.current && audioRef.current.audio.current) {
+      audioRef.current.audio.current.pause();
+    }
   };
 
   useEffect(() => {
