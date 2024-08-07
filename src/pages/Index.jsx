@@ -42,6 +42,8 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite
 
 const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShare, onSettings }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   if (!currentPodcast) return null;
 
@@ -51,6 +53,12 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
 
   const handlePause = () => {
     setIsPlaying(false);
+  };
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -83,6 +91,8 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
         src={currentPodcast.audioSrc}
         onPlay={handlePlay}
         onPause={handlePause}
+        onListen={(e) => setCurrentTime(e.target.currentTime)}
+        onLoadedMetadata={(e) => setDuration(e.target.duration)}
         showJumpControls={true}
         layout="stacked"
         customProgressBarSection={[
@@ -94,6 +104,14 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           "MAIN_CONTROLS",
           "VOLUME_CONTROLS",
         ]}
+        customIcons={{
+          play: <Play className="w-6 h-6" />,
+          pause: <Pause className="w-6 h-6" />,
+          rewind: <SkipBack className="w-6 h-6" />,
+          forward: <SkipForward className="w-6 h-6" />,
+          volume: <Volume2 className="w-6 h-6" />,
+        }}
+        timeFormat={(currentTime, duration) => `${formatTime(currentTime)} / ${formatTime(duration)}`}
       />
     </div>
   );
