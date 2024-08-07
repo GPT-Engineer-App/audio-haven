@@ -57,7 +57,7 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md h-[200px] flex flex-col relative">
+    <div className="bg-white p-4 rounded-lg shadow-md flex flex-col relative">
       <div className="flex mb-2">
         <img src={avatar} alt={author} className="w-10 h-10 object-cover mr-2" />
         <div className="overflow-hidden flex-1">
@@ -214,7 +214,7 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
         onClick={onClose}
         className="absolute top-1 right-1 p-1"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </Button>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 mt-4">
         <div className="flex items-center flex-1 min-w-0">
