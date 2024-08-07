@@ -4,44 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const VolumeControl = ({ volume, setVolume }) => {
-  const [prevVolume, setPrevVolume] = useState(volume);
-
   const handleVolumeChange = (value) => {
-    const newVolume = value[0] / 100;
-    setVolume(newVolume);
-    if (newVolume > 0) {
-      setPrevVolume(newVolume);
-    }
-  };
-
-  const toggleMute = () => {
-    if (volume > 0) {
-      setPrevVolume(volume);
-      setVolume(0);
-    } else {
-      setVolume(prevVolume > 0 ? prevVolume : 0.5);
-    }
+    setVolume(value[0] / 100);
   };
 
   return (
-    <div className="flex items-center space-x-1">
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant="ghost" size="sm" className="p-1">
-            {volume === 0 ? <VolumeX className="w-4 h-4 fill-current" /> : <Volume2 className="w-4 h-4 fill-current" />}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-2">
-          <Slider
-            orientation="vertical"
-            value={[volume * 100]}
-            max={100}
-            step={1}
-            onValueChange={handleVolumeChange}
-            className="h-24"
-          />
-        </PopoverContent>
-      </Popover>
+    <div className="flex items-center space-x-2">
+      <Button variant="ghost" size="sm" onClick={() => setVolume(volume === 0 ? 1 : 0)}>
+        {volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+      </Button>
+      <Slider
+        value={[volume * 100]}
+        max={100}
+        step={1}
+        onValueChange={handleVolumeChange}
+        className="w-24"
+      />
     </div>
   );
 };
