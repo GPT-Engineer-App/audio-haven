@@ -41,25 +41,23 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite
 );
 
 const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShare, onSettings }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.audio.current.play();
+      } else {
+        audioRef.current.audio.current.pause();
+      }
+    }
+  }, [isPlaying, currentPodcast]);
 
   if (!currentPodcast) return null;
 
-  const handlePlay = () => {
-    setIsPlaying(true);
-  };
-
-  const handlePause = () => {
-    setIsPlaying(false);
-  };
-
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  };
+  const handlePlay = () => setIsPlaying(true);
+  const handlePause = () => setIsPlaying(false);
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4">
@@ -87,12 +85,11 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
         </div>
       </div>
       <AudioPlayer
+        ref={audioRef}
         autoPlay
         src={currentPodcast.audioSrc}
         onPlay={handlePlay}
         onPause={handlePause}
-        onListen={(e) => setCurrentTime(e.target.currentTime)}
-        onLoadedMetadata={(e) => setDuration(e.target.duration)}
         showJumpControls={true}
         layout="stacked"
         customProgressBarSection={[
@@ -111,7 +108,6 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           forward: <SkipForward className="w-6 h-6" />,
           volume: <Volume2 className="w-6 h-6" />,
         }}
-        timeFormat={(currentTime, duration) => `${formatTime(currentTime)} / ${formatTime(duration)}`}
       />
     </div>
   );
@@ -133,13 +129,13 @@ const Index = () => {
   const audioRef = useRef(null);
 
   const trendingPodcasts = [
-    { title: "Tech Talk", author: "Jane Doe", tags: ["technology", "news"], avatar: "/placeholder.svg", audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-    { title: "Daily Digest", author: "John Smith", tags: ["news", "politics"], avatar: "/placeholder.svg", audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+    { title: "Tech Talk", author: "Jane Doe", tags: ["technology", "news"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" },
+    { title: "Daily Digest", author: "John Smith", tags: ["news", "politics"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-hip-hop-02-738.mp3" },
   ];
 
   const topRatedPodcasts = [
-    { title: "Science Hour", author: "Dr. Brown", tags: ["science", "education"], avatar: "/placeholder.svg", audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
-    { title: "Comedy Central", author: "Laugh Co.", tags: ["comedy", "entertainment"], avatar: "/placeholder.svg", audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
+    { title: "Science Hour", author: "Dr. Brown", tags: ["science", "education"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-dreaming-big-31.mp3" },
+    { title: "Comedy Central", author: "Laugh Co.", tags: ["comedy", "entertainment"], avatar: "/placeholder.svg", audioSrc: "https://assets.mixkit.co/music/preview/mixkit-funny-circus-clowns-310.mp3" },
   ];
 
   const handlePlay = (podcast) => {
