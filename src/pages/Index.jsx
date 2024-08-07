@@ -42,13 +42,13 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    if (!navigator.mediaSession) return;
+    if (!navigator.mediaSession || !currentPodcast) return;
 
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: currentPodcast.title,
-      artist: currentPodcast.author,
-      album: currentPodcast.tags.join(', '),
-      artwork: [{ src: currentPodcast.avatar, sizes: '512x512', type: 'image/svg+xml' }]
+      title: currentPodcast.title || '',
+      artist: currentPodcast.author || '',
+      album: currentPodcast.tags ? currentPodcast.tags.join(', ') : '',
+      artwork: [{ src: currentPodcast.avatar || '', sizes: '512x512', type: 'image/svg+xml' }]
     });
 
     navigator.mediaSession.setActionHandler('play', () => playTrack());
@@ -154,7 +154,13 @@ const Index = () => {
     const index = allPodcasts.findIndex(p => p.title === podcast.title);
     setCurrentPodcastIndex(index);
     setCurrentPodcast(podcast);
-    document.getElementById('audio-player').play();
+    // Delay playing until the next render cycle when the audio element is available
+    setTimeout(() => {
+      const audioPlayer = document.getElementById('audio-player');
+      if (audioPlayer) {
+        audioPlayer.play();
+      }
+    }, 0);
   };
 
   const handlePrevTrack = () => {
