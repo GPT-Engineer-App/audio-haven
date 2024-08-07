@@ -40,6 +40,10 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite
 
 const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShare, onSettings, onPrevTrack, onNextTrack }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const audioRef = useRef(null);
 
   useEffect(() => {
     if (!navigator.mediaSession || !currentPodcast) return;
@@ -64,14 +68,47 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
     };
   }, [currentPodcast, onPrevTrack, onNextTrack]);
 
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.addEventListener('timeupdate', handleTimeUpdate);
+      audioRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
+      audioRef.current.addEventListener('ended', handleTrackEnded);
+    }
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.removeEventListener('timeupdate', handleTimeUpdate);
+        audioRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        audioRef.current.removeEventListener('ended', handleTrackEnded);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
+
+  const handleTimeUpdate = () => {
+    setCurrentTime(audioRef.current.currentTime);
+  };
+
+  const handleLoadedMetadata = () => {
+    setDuration(audioRef.current.duration);
+  };
+
+  const handleTrackEnded = () => {
+    onNextTrack();
+  };
+
   const playTrack = () => {
-    document.getElementById('audio-player').play();
+    audioRef.current.play();
     setIsPlaying(true);
     navigator.mediaSession.playbackState = "playing";
   };
 
   const pauseTrack = () => {
-    document.getElementById('audio-player').pause();
+    audioRef.current.pause();
     setIsPlaying(false);
     navigator.mediaSession.playbackState = "paused";
   };
@@ -84,19 +121,41 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
     }
   };
 
+  const handleSeek = (newTime) => {
+    audioRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
+
   if (!currentPodcast) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4">
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center">
+        <div className="flex items-center flex-1">
           <img src={currentPodcast.avatar} alt={currentPodcast.author} className="w-12 h-12 rounded-full mr-3" />
           <div>
             <h3 className="font-semibold">{currentPodcast.title}</h3>
             <p className="text-sm text-gray-600">{currentPodcast.author}</p>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 flex-1 justify-center">
+          <Button variant="ghost" size="icon" onClick={onPrevTrack}>
+            <SkipBack className="w-6 h-6" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={handlePlayPause}>
+            {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onNextTrack}>
+            <SkipForward className="w-6 h-6" />
+          </Button>
+        </div>
+        <div className="flex items-center space-x-2 flex-1 justify-end">
           <Button variant="ghost" size="icon" onClick={onFavorite}>
             <Star className={`w-5 h-5 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
           </Button>
@@ -111,18 +170,33 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           </Button>
         </div>
       </div>
-      <div className="flex justify-center items-center mt-4">
-        <Button variant="ghost" size="icon" onClick={onPrevTrack}>
-          <SkipBack className="w-6 h-6" />
-        </Button>
-        <Button variant="ghost" size="icon" onClick={handlePlayPause}>
-          {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
-        </Button>
-        <Button variant="ghost" size="icon" onClick={onNextTrack}>
-          <SkipForward className="w-6 h-6" />
-        </Button>
+      <div className="flex items-center space-x-2">
+        <span className="text-sm">{formatTime(currentTime)}</span>
+        <Slider
+          value={[currentTime]}
+          max={duration}
+          step={1}
+          onValueChange={(value) => handleSeek(value[0])}
+          className="flex-1"
+        />
+        <span className="text-sm">{formatTime(duration)}</span>
       </div>
-      <audio id="audio-player" src={currentPodcast.audioSrc} />
+      <div className="flex items-center mt-2">
+        <Volume2 className="w-5 h-5 mr-2" />
+        <Slider
+          value={[volume * 100]}
+          max={100}
+          step={1}
+          onValueChange={(value) => setVolume(value[0] / 100)}
+          className="w-24"
+        />
+      </div>
+      <audio
+        ref={audioRef}
+        src={currentPodcast.audioSrc}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+      />
     </div>
   );
 };
@@ -167,16 +241,12 @@ const Index = () => {
     const newIndex = (currentPodcastIndex - 1 + allPodcasts.length) % allPodcasts.length;
     setCurrentPodcastIndex(newIndex);
     setCurrentPodcast(allPodcasts[newIndex]);
-    document.getElementById('audio-player').src = allPodcasts[newIndex].audioSrc;
-    document.getElementById('audio-player').play();
   };
 
   const handleNextTrack = () => {
     const newIndex = (currentPodcastIndex + 1) % allPodcasts.length;
     setCurrentPodcastIndex(newIndex);
     setCurrentPodcast(allPodcasts[newIndex]);
-    document.getElementById('audio-player').src = allPodcasts[newIndex].audioSrc;
-    document.getElementById('audio-player').play();
   };
 
   const handleFavorite = (podcast) => {
