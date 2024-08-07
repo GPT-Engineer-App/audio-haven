@@ -25,16 +25,23 @@ const VolumeControl = ({ volume, setVolume }) => {
 
   return (
     <div className="flex items-center space-x-1">
-      <Button variant="ghost" size="sm" onClick={toggleMute} className="p-1">
-        {volume === 0 ? <VolumeX className="w-4 h-4 fill-current" /> : <Volume2 className="w-4 h-4 fill-current" />}
-      </Button>
-      <Slider
-        value={[volume * 100]}
-        max={100}
-        step={1}
-        onValueChange={handleVolumeChange}
-        className="w-16 sm:w-24"
-      />
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="ghost" size="sm" className="p-1">
+            {volume === 0 ? <VolumeX className="w-4 h-4 fill-current" /> : <Volume2 className="w-4 h-4 fill-current" />}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-2">
+          <Slider
+            orientation="vertical"
+            value={[volume * 100]}
+            max={100}
+            step={1}
+            onValueChange={handleVolumeChange}
+            className="h-24"
+          />
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };
@@ -236,6 +243,7 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           <Button variant="ghost" size="icon" onClick={onNextTrack} className="text-black">
             <SkipForward className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />
           </Button>
+          <VolumeControl volume={volume} setVolume={setVolume} />
         </div>
         <div className="flex items-center space-x-2 flex-1 w-full">
           <span className="text-xs sm:text-sm whitespace-nowrap">
@@ -249,19 +257,16 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
             className="flex-1"
           />
         </div>
-        <div className="flex items-center space-x-1 sm:space-x-2">
-          <VolumeControl volume={volume} setVolume={setVolume} />
-          <div className="flex items-center space-x-1">
-            <Button variant="ghost" size="sm" onClick={onFavorite} className="p-1 sm:p-2">
-              <Star className={`w-4 h-4 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={onShare} className="p-1 sm:p-2">
-              <Share2 className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={onSettings} className="p-1 sm:p-2">
-              <Settings className="w-4 h-4" />
-            </Button>
-          </div>
+        <div className="flex items-center space-x-1">
+          <Button variant="ghost" size="sm" onClick={onFavorite} className="p-1 sm:p-2">
+            <Star className={`w-4 h-4 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={onShare} className="p-1 sm:p-2">
+            <Share2 className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={onSettings} className="p-1 sm:p-2">
+            <Settings className="w-4 h-4" />
+          </Button>
         </div>
       </div>
       <audio
