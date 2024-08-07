@@ -3,6 +3,13 @@ import { Search, Headphones, Star, Flag, Play, Pause, SkipBack, SkipForward, Sha
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
+const Logo = () => (
+  <div className="flex items-center space-x-2">
+    <Headphones className="w-8 h-8 text-primary" />
+    <span className="text-xl font-bold">PodcastHub</span>
+  </div>
+);
+
 const VolumeControl = ({ volume, setVolume }) => {
   const [prevVolume, setPrevVolume] = useState(volume);
 
@@ -354,13 +361,14 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-4 pb-32">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
+        <div className="flex justify-between items-center mb-6">
+          <Logo />
           <Input
             type="text"
             placeholder="Search podcasts..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full"
+            className="w-full max-w-md ml-4"
           />
         </div>
 
