@@ -7,8 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FacebookShareButton, TwitterShareButton, LinkedinShareButton } from 'react-share';
-import AudioPlayer, { RHAP_UI } from 'react-h5-audio-player';
-import 'react-h5-audio-player/lib/styles.css';
+import { useState, useEffect, useRef } from 'react';
 
 const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite, isFavorite }) => (
   <div className="bg-white p-4 rounded-lg shadow-md h-[200px] flex flex-col relative">
@@ -42,18 +41,69 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite
 
 const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShare, onSettings, onPrevTrack, onNextTrack }) => {
   const audioRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
-  if (!currentPodcast) return null;
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.addEventListener('timeupdate', handleTimeUpdate);
+      audioRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
+      audioRef.current.addEventListener('ended', handleEnded);
+    }
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.removeEventListener('timeupdate', handleTimeUpdate);
+        audioRef.current.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        audioRef.current.removeEventListener('ended', handleEnded);
+      }
+    };
+  }, [currentPodcast]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.src = currentPodcast.audioSrc;
+      audioRef.current.play();
+    }
+  }, [currentPodcast]);
+
+  const handleTimeUpdate = () => {
+    setCurrentTime(audioRef.current.currentTime);
+  };
+
+  const handleLoadedMetadata = () => {
+    setDuration(audioRef.current.duration);
+  };
+
+  const handleEnded = () => {
+    setIsPlaying(false);
+    setCurrentTime(0);
+  };
 
   const handlePlayPause = () => {
-    if (audioRef.current && audioRef.current.audio.current) {
-      if (audioRef.current.audio.current.paused) {
-        audioRef.current.audio.current.play();
-      } else {
-        audioRef.current.audio.current.pause();
-      }
+    if (audioRef.current.paused) {
+      audioRef.current.play();
+      setIsPlaying(true);
+    } else {
+      audioRef.current.pause();
+      setIsPlaying(false);
     }
   };
+
+  const handleSeek = (e) => {
+    const seekTime = (e.nativeEvent.offsetX / e.target.offsetWidth) * duration;
+    audioRef.current.currentTime = seekTime;
+    setCurrentTime(seekTime);
+  };
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
+
+  if (!currentPodcast) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4">
@@ -80,35 +130,30 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           </Button>
         </div>
       </div>
-      <AudioPlayer
-        ref={audioRef}
-        autoPlay={true}
-        src={currentPodcast.audioSrc}
-        showJumpControls={false}
-        layout="stacked"
-        customProgressBarSection={[
-          RHAP_UI.CURRENT_TIME,
-          RHAP_UI.PROGRESS_BAR,
-          RHAP_UI.DURATION,
-        ]}
-        customControlsSection={[
-          <Button key="prev" variant="ghost" size="icon" onClick={onPrevTrack}>
+      <div className="flex flex-col">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm">{formatTime(currentTime)}</span>
+          <span className="text-sm">{formatTime(duration)}</span>
+        </div>
+        <div className="w-full bg-gray-200 h-1 rounded-full cursor-pointer" onClick={handleSeek}>
+          <div
+            className="bg-blue-500 h-1 rounded-full"
+            style={{ width: `${(currentTime / duration) * 100}%` }}
+          ></div>
+        </div>
+        <div className="flex justify-center items-center mt-4">
+          <Button variant="ghost" size="icon" onClick={onPrevTrack}>
             <SkipBack className="w-6 h-6" />
-          </Button>,
-          RHAP_UI.MAIN_CONTROLS,
-          <Button key="next" variant="ghost" size="icon" onClick={onNextTrack}>
+          </Button>
+          <Button variant="ghost" size="icon" onClick={handlePlayPause}>
+            {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onNextTrack}>
             <SkipForward className="w-6 h-6" />
-          </Button>,
-          RHAP_UI.VOLUME_CONTROLS,
-        ]}
-        customIcons={{
-          play: <Play className="w-6 h-6" />,
-          pause: <Pause className="w-6 h-6" />,
-          rewind: <Rewind className="w-6 h-6" />,
-          forward: <FastForward className="w-6 h-6" />,
-          volume: <Volume2 className="w-6 h-6" />,
-        }}
-      />
+          </Button>
+        </div>
+      </div>
+      <audio ref={audioRef} />
     </div>
   );
 };
