@@ -19,7 +19,7 @@ const VolumeControl = ({ volume, setVolume }) => {
             max={100}
             step={1}
             onValueChange={(value) => setVolume(value[0] / 100)}
-            className="h-20"
+            className="h-24 w-2"
           />
         </div>
       </PopoverContent>
@@ -30,16 +30,17 @@ const VolumeControl = ({ volume, setVolume }) => {
 // Add this CSS to ensure proper alignment and appearance
 const volumeSliderStyles = `
   .volume-slider [data-orientation="vertical"] {
-    height: 100%;
+    height: 100px;
   }
   .volume-slider [data-orientation="vertical"] [data-orientation="vertical"] {
     height: 100%;
     width: 3px;
-    background-color: black;
   }
   .volume-slider [role="slider"] {
-    left: 50% !important;
-    transform: translateX(-50%);
+    width: 100%;
+    height: 10px;
+    background-color: black;
+    border-radius: 0;
   }
 `;
 import { Input } from "@/components/ui/input";
