@@ -67,29 +67,10 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
-  };
-
-  const handleSkipForward = () => {
-    if (audioRef.current && audioRef.current.audio.current) {
-      audioRef.current.audio.current.currentTime += 10;
+    if (!isPlaying && audioRef.current && audioRef.current.audio.current) {
+      audioRef.current.audio.current.play();
     }
   };
-
-  const handleSkipBackward = () => {
-    if (audioRef.current && audioRef.current.audio.current) {
-      audioRef.current.audio.current.currentTime -= 10;
-    }
-  };
-
-  const Skip10SecButton = ({ direction, onClick }) => (
-    <Button variant="ghost" size="icon" onClick={onClick} className="relative">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-        <path d={direction === 'forward' ? "M21 12a9 9 0 11-6.219-8.56" : "M3 12a9 9 0 116.219-8.56"} />
-        <path d={direction === 'forward' ? "M12 7l3 3-3 3" : "M12 17l-3-3 3-3"} />
-      </svg>
-      <span className="absolute text-xs font-bold">{direction === 'forward' ? '+10' : '-10'}</span>
-    </Button>
-  );
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4">
@@ -133,10 +114,6 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           <Button key="prev" variant="ghost" size="icon" onClick={onPrevTrack}>
             <SkipBack className="w-6 h-6" />
           </Button>,
-          <div key="skip-buttons" className="flex items-center space-x-2">
-            <Skip10SecButton direction="backward" onClick={handleSkipBackward} />
-            <Skip10SecButton direction="forward" onClick={handleSkipForward} />
-          </div>,
           <Button key="play" variant="ghost" size="icon" onClick={handlePlayPause}>
             {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
           </Button>,
