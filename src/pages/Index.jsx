@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FacebookShareButton, TwitterShareButton, LinkedinShareButton } from 'react-share';
-import AudioPlayer from 'react-h5-audio-player';
+import AudioPlayer, { RHAP_UI } from 'react-h5-audio-player';
 import 'react-h5-audio-player/lib/styles.css';
 
 const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite, isFavorite }) => (
@@ -92,18 +92,15 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
 
   const Skip10SecButton = ({ direction, onClick }) => (
     <Button variant="ghost" size="icon" onClick={onClick} className="relative">
-      <div className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center">
-        <span className="text-xs font-bold">10</span>
-      </div>
-      {direction === 'forward' ? (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 absolute top-0 right-0">
-          <polyline points="9 18 15 12 9 6"></polyline>
-        </svg>
-      ) : (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 absolute top-0 left-0">
-          <polyline points="15 18 9 12 15 6"></polyline>
-        </svg>
-      )}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+        <path d="M21 12a9 9 0 11-9-9" />
+        {direction === 'forward' ? (
+          <polyline points="15 3 21 3 21 9" />
+        ) : (
+          <polyline points="9 3 3 3 3 9" />
+        )}
+      </svg>
+      <span className="absolute text-xs font-bold">{direction === 'forward' ? '+10' : '-10'}</span>
     </Button>
   );
 
@@ -136,8 +133,8 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
         ref={audioRef}
         autoPlay
         src={currentPodcast.audioSrc}
-        onPlay={handlePlay}
-        onPause={handlePause}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
         showJumpControls={false}
         layout="stacked"
         customProgressBarSection={[
@@ -146,16 +143,18 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           "DURATION",
         ]}
         customControlsSection={[
-          <Skip10SecButton key="backward" direction="backward" onClick={handleSkipBackward} />,
           <Button key="prev" variant="ghost" size="icon" onClick={onPrevTrack}>
             <SkipBack className="w-6 h-6" />
           </Button>,
-          "MAIN_CONTROLS",
+          <div key="skip-buttons" className="flex items-center space-x-2">
+            <Skip10SecButton direction="backward" onClick={handleSkipBackward} />
+            <Skip10SecButton direction="forward" onClick={handleSkipForward} />
+          </div>,
+          RHAP_UI.MAIN_CONTROLS,
           <Button key="next" variant="ghost" size="icon" onClick={onNextTrack}>
             <SkipForward className="w-6 h-6" />
           </Button>,
-          <Skip10SecButton key="forward" direction="forward" onClick={handleSkipForward} />,
-          "VOLUME_CONTROLS",
+          RHAP_UI.VOLUME_CONTROLS,
         ]}
         customIcons={{
           play: <Play className="w-6 h-6" />,
