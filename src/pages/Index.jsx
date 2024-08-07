@@ -41,19 +41,18 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite
 );
 
 const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShare, onSettings, onPrevTrack, onNextTrack }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const audioRef = useRef(null);
 
   useEffect(() => {
-    if (audioRef.current) {
-      const audioElement = audioRef.current.audio.current;
+    if (audioRef.current && audioRef.current.audio.current) {
       if (isPlaying) {
-        audioElement.play();
+        audioRef.current.audio.current.play();
       } else {
-        audioElement.pause();
+        audioRef.current.audio.current.pause();
       }
     }
-  }, [isPlaying]);
+  }, [isPlaying, currentPodcast]);
 
   useEffect(() => {
     return () => {
@@ -67,9 +66,6 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
-    if (!isPlaying && audioRef.current && audioRef.current.audio.current) {
-      audioRef.current.audio.current.play();
-    }
   };
 
   return (
@@ -99,7 +95,7 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
       </div>
       <AudioPlayer
         ref={audioRef}
-        autoPlay={false}
+        autoPlay={true}
         src={currentPodcast.audioSrc}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
@@ -163,6 +159,8 @@ const Index = () => {
     setCurrentPodcastIndex(index);
     setCurrentPodcast(podcast);
     setIsPlaying(true);
+    // Force a re-render to ensure the audio player updates
+    setTimeout(() => setIsPlaying(true), 0);
   };
 
   const handlePrevTrack = () => {
