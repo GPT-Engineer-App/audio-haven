@@ -216,7 +216,7 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
             <p className="text-sm text-gray-600 truncate">{currentPodcast.author}</p>
           </div>
         </div>
-        <div className="flex items-center space-x-2 justify-end mt-2 sm:mt-0">
+        <div className="flex items-center space-x-2 justify-end mt-2 sm:mt-0 ml-auto">
           <Button variant="ghost" size="icon" onClick={onFavorite}>
             <Star className={`w-5 h-5 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
           </Button>
@@ -231,7 +231,7 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           </Button>
         </div>
       </div>
-      <div className="flex items-center space-x-4 mt-2">
+      <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 mt-2">
         <div className="flex items-center space-x-2">
           <Button variant="ghost" size="icon" onClick={onPrevTrack} className="text-black">
             <SkipBack className="w-6 h-6 fill-current" />
@@ -243,7 +243,7 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
             <SkipForward className="w-6 h-6 fill-current" />
           </Button>
         </div>
-        <div className="flex items-center space-x-2 flex-1">
+        <div className="flex items-center space-x-2 flex-1 w-full sm:w-auto">
           <span className="text-sm whitespace-nowrap">
             {formatTime(currentTime)} / {formatTime(duration)}
           </span>
