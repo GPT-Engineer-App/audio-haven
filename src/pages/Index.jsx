@@ -212,7 +212,7 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
         variant="ghost"
         size="sm"
         onClick={onClose}
-        className="absolute top-2 right-2 p-1 font-bold text-lg"
+        className="absolute top-2 left-2 p-1 font-bold text-lg"
       >
         ✕
       </Button>
