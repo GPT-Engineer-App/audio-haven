@@ -208,19 +208,19 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onClose}
-        className="absolute top-2 right-2 p-1 font-bold text-lg"
-      >
-        ✕
-      </Button>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2">
-        <div className="flex items-center flex-1 min-w-0 pl-2">
+      <div className="flex justify-between items-start mb-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onClose}
+          className="p-1 font-bold text-lg"
+        >
+          ✕
+        </Button>
+        <div className="flex items-center flex-1 min-w-0 pl-4">
           <img src={currentPodcast.avatar} alt={currentPodcast.author} className="w-12 h-12 rounded-full mr-3 flex-shrink-0" />
           <div className="flex-1 mr-4 min-w-0">
-            <h3 className="font-semibold text-lg leading-tight line-clamp-2 sm:line-clamp-1 md:line-clamp-2">{currentPodcast.title}</h3>
+            <h3 className="font-semibold text-lg leading-tight line-clamp-2">{currentPodcast.title}</h3>
             <p className="text-sm text-gray-600 truncate">{currentPodcast.author}</p>
           </div>
         </div>
