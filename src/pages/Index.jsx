@@ -24,16 +24,16 @@ const VolumeControl = ({ volume, setVolume }) => {
   };
 
   return (
-    <div className="flex items-center space-x-2">
-      <Button variant="ghost" size="sm" onClick={toggleMute} className="p-0">
-        {volume === 0 ? <VolumeX className="w-5 h-5 fill-current" /> : <Volume2 className="w-5 h-5 fill-current" />}
+    <div className="flex items-center space-x-1">
+      <Button variant="ghost" size="sm" onClick={toggleMute} className="p-1">
+        {volume === 0 ? <VolumeX className="w-4 h-4 fill-current" /> : <Volume2 className="w-4 h-4 fill-current" />}
       </Button>
       <Slider
         value={[volume * 100]}
         max={100}
         step={1}
         onValueChange={handleVolumeChange}
-        className="w-24"
+        className="w-16 sm:w-24"
       />
     </div>
   );
@@ -217,32 +217,20 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           </div>
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 mt-2">
-        <div className="flex items-center space-x-2">
+      <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 mt-2">
+        <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
           <Button variant="ghost" size="icon" onClick={onPrevTrack} className="text-black">
-            <SkipBack className="w-6 h-6 fill-current" />
+            <SkipBack className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />
           </Button>
           <Button variant="ghost" size="icon" onClick={handlePlayPause} className="text-black">
-            {isPlaying ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current" />}
+            {isPlaying ? <Pause className="w-5 h-5 sm:w-6 sm:h-6 fill-current" /> : <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />}
           </Button>
           <Button variant="ghost" size="icon" onClick={onNextTrack} className="text-black">
-            <SkipForward className="w-6 h-6 fill-current" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={onFavorite}>
-            <Star className={`w-4 h-4 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={onShare}>
-            <Share2 className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={onSettings}>
-            <Settings className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <SkipForward className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />
           </Button>
         </div>
-        <div className="flex items-center space-x-2 flex-1 w-full sm:w-auto">
-          <span className="text-sm whitespace-nowrap">
+        <div className="flex items-center space-x-2 flex-1 w-full">
+          <span className="text-xs sm:text-sm whitespace-nowrap">
             {formatTime(currentTime)} / {formatTime(duration)}
           </span>
           <Slider
@@ -253,7 +241,23 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
             className="flex-1"
           />
         </div>
-        <VolumeControl volume={volume} setVolume={setVolume} />
+        <div className="flex items-center space-x-1 sm:space-x-2">
+          <VolumeControl volume={volume} setVolume={setVolume} />
+          <div className="flex items-center space-x-1">
+            <Button variant="ghost" size="sm" onClick={onFavorite} className="p-1 sm:p-2">
+              <Star className={`w-4 h-4 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onShare} className="p-1 sm:p-2">
+              <Share2 className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onSettings} className="p-1 sm:p-2">
+              <Settings className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onClose} className="p-1 sm:p-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </Button>
+          </div>
+        </div>
       </div>
       <audio
         ref={audioRef}
