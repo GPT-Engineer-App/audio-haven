@@ -41,31 +41,18 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite
 );
 
 const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShare, onSettings, onPrevTrack, onNextTrack }) => {
-  const [isPlaying, setIsPlaying] = useState(true);
   const audioRef = useRef(null);
 
-  useEffect(() => {
+  if (!currentPodcast) return null;
+
+  const handlePlayPause = () => {
     if (audioRef.current && audioRef.current.audio.current) {
-      if (isPlaying) {
+      if (audioRef.current.audio.current.paused) {
         audioRef.current.audio.current.play();
       } else {
         audioRef.current.audio.current.pause();
       }
     }
-  }, [isPlaying, currentPodcast]);
-
-  useEffect(() => {
-    return () => {
-      if (audioRef.current && audioRef.current.audio.current) {
-        audioRef.current.audio.current.pause();
-      }
-    };
-  }, []);
-
-  if (!currentPodcast) return null;
-
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
   };
 
   return (
@@ -88,7 +75,7 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           <Button variant="ghost" size="icon" onClick={onSettings}>
             <Settings className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => { setIsPlaying(false); onClose(); }}>
+          <Button variant="ghost" size="icon" onClick={onClose}>
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </Button>
         </div>
@@ -97,22 +84,18 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
         ref={audioRef}
         autoPlay={true}
         src={currentPodcast.audioSrc}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
         showJumpControls={false}
         layout="stacked"
         customProgressBarSection={[
-          "CURRENT_TIME",
-          "PROGRESS_BAR",
-          "DURATION",
+          RHAP_UI.CURRENT_TIME,
+          RHAP_UI.PROGRESS_BAR,
+          RHAP_UI.DURATION,
         ]}
         customControlsSection={[
           <Button key="prev" variant="ghost" size="icon" onClick={onPrevTrack}>
             <SkipBack className="w-6 h-6" />
           </Button>,
-          <Button key="play" variant="ghost" size="icon" onClick={handlePlayPause}>
-            {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
-          </Button>,
+          RHAP_UI.MAIN_CONTROLS,
           <Button key="next" variant="ghost" size="icon" onClick={onNextTrack}>
             <SkipForward className="w-6 h-6" />
           </Button>,
@@ -121,6 +104,8 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
         customIcons={{
           play: <Play className="w-6 h-6" />,
           pause: <Pause className="w-6 h-6" />,
+          rewind: <Rewind className="w-6 h-6" />,
+          forward: <FastForward className="w-6 h-6" />,
           volume: <Volume2 className="w-6 h-6" />,
         }}
       />
@@ -158,9 +143,6 @@ const Index = () => {
     const index = allPodcasts.findIndex(p => p.title === podcast.title);
     setCurrentPodcastIndex(index);
     setCurrentPodcast(podcast);
-    setIsPlaying(true);
-    // Force a re-render to ensure the audio player updates
-    setTimeout(() => setIsPlaying(true), 0);
   };
 
   const handlePrevTrack = () => {
@@ -195,17 +177,7 @@ const Index = () => {
 
   const handleClosePlayer = () => {
     setCurrentPodcast(null);
-    setIsPlaying(false);
-    if (audioRef.current && audioRef.current.audio.current) {
-      audioRef.current.audio.current.pause();
-    }
   };
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.playbackRate = playbackSpeed;
-    }
-  }, [playbackSpeed]);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 pb-32">
