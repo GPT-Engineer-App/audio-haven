@@ -30,7 +30,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { FacebookShareButton, TwitterShareButton, LinkedinShareButton } from 'react-share';
 
-const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onLike, isLiked }) => {
+const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite, isFavorite }) => {
   const handlePlay = () => {
     onPlay({ title, author, avatar, audioSrc });
     setTimeout(() => {
@@ -64,9 +64,9 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onLike, is
             <Play className="w-4 h-4 mr-1" />
             Play
           </Button>
-          <Button variant="outline" size="sm" onClick={onLike}>
-            <Star className={`w-4 h-4 mr-1 ${isLiked ? 'text-yellow-500 fill-yellow-500' : ''}`} />
-            {isLiked ? 'Liked' : 'Like'}
+          <Button variant="outline" size="sm" onClick={onFavorite}>
+            <Star className={`w-4 h-4 mr-1 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
+            {isFavorite ? 'Favorited' : 'Favorite'}
           </Button>
         </div>
       </div>
@@ -74,7 +74,7 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onLike, is
   );
 };
 
-const PodcastPlayer = ({ currentPodcast, onClose, onLike, isLiked, onShare, onSettings, onPrevTrack, onNextTrack }) => {
+const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShare, onSettings, onPrevTrack, onNextTrack }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -236,8 +236,8 @@ const PodcastPlayer = ({ currentPodcast, onClose, onLike, isLiked, onShare, onSe
           />
         </div>
         <div className="flex items-center space-x-1">
-          <Button variant="ghost" size="sm" onClick={onLike} className="p-1 sm:p-2">
-            <Star className={`w-4 h-4 ${isLiked ? 'text-yellow-500 fill-yellow-500' : ''}`} />
+          <Button variant="ghost" size="sm" onClick={onFavorite} className="p-1 sm:p-2">
+            <Star className={`w-4 h-4 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
           </Button>
           <Button variant="ghost" size="sm" onClick={onShare} className="p-1 sm:p-2">
             <Share2 className="w-4 h-4" />
@@ -260,7 +260,7 @@ const PodcastPlayer = ({ currentPodcast, onClose, onLike, isLiked, onShare, onSe
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPodcast, setCurrentPodcast] = useState(null);
-  const [likedPodcasts, setLikedPodcasts] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [currentPodcastIndex, setCurrentPodcastIndex] = useState(0);
@@ -312,12 +312,12 @@ const Index = () => {
   const handlePrevTrack = () => handleTrackChange('prev');
   const handleNextTrack = () => handleTrackChange('next');
 
-  const handleLike = (podcast) => {
-    setLikedPodcasts(prevLiked => {
-      if (prevLiked.some(liked => liked.title === podcast.title)) {
-        return prevLiked.filter(liked => liked.title !== podcast.title);
+  const handleFavorite = (podcast) => {
+    setFavorites(prevFavorites => {
+      if (prevFavorites.some(fav => fav.title === podcast.title)) {
+        return prevFavorites.filter(fav => fav.title !== podcast.title);
       } else {
-        return [...prevLiked, podcast];
+        return [...prevFavorites, podcast];
       }
     });
   };
@@ -355,8 +355,8 @@ const Index = () => {
                 key={index}
                 {...podcast}
                 onPlay={handlePlay}
-                onLike={() => handleLike(podcast)}
-                isLiked={likedPodcasts.some(liked => liked.title === podcast.title)}
+                onFavorite={() => handleFavorite(podcast)}
+                isFavorite={favorites.some(fav => fav.title === podcast.title)}
               />
             ))}
           </div>
@@ -391,8 +391,8 @@ const Index = () => {
         <PodcastPlayer
           currentPodcast={currentPodcast}
           onClose={handleClosePlayer}
-          onLike={() => handleLike(currentPodcast)}
-          isLiked={likedPodcasts.some(liked => liked.title === currentPodcast.title)}
+          onFavorite={() => handleFavorite(currentPodcast)}
+          isFavorite={favorites.some(fav => fav.title === currentPodcast.title)}
           onShare={handleShare}
           onSettings={handleSettings}
           onPrevTrack={handlePrevTrack}
