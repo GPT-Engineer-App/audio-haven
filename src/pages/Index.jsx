@@ -370,8 +370,8 @@ const Index = () => {
                 key={index}
                 {...podcast}
                 onPlay={handlePlay}
-                onFavorite={() => handleFavorite(podcast)}
-                isFavorite={favorites.some(fav => fav.title === podcast.title)}
+                onLike={() => handleLike(podcast)}
+                isLiked={likedPodcasts.some(liked => liked.title === podcast.title)}
               />
             ))}
           </div>
