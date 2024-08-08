@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { Search, Headphones, Star, Flag, Play, Pause, SkipBack, SkipForward, Share2, Settings, Volume2, VolumeX } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import posthog from 'posthog-js';
 
 const VolumeControl = ({ volume, setVolume }) => {
   const handleVolumeChange = (value) => {
@@ -294,7 +293,6 @@ const Index = () => {
         audioPlayer.play();
       }
     }, 0);
-    posthog.capture('podcast_played', { podcast_title: podcast.title, podcast_author: podcast.author });
   };
 
   const handleTrackChange = (direction) => {
@@ -316,27 +314,16 @@ const Index = () => {
 
   const handleLike = (podcast) => {
     setLikedPodcasts(prevLiked => {
-      const isLiked = prevLiked.some(liked => liked.title === podcast.title);
-      const newLikedPodcasts = isLiked
-        ? prevLiked.filter(liked => liked.title !== podcast.title)
-        : [...prevLiked, podcast];
-      
-      posthog.capture('podcast_like_toggled', { 
-        podcast_title: podcast.title, 
-        podcast_author: podcast.author,
-        action: isLiked ? 'unliked' : 'liked'
-      });
-      
-      return newLikedPodcasts;
+      if (prevLiked.some(liked => liked.title === podcast.title)) {
+        return prevLiked.filter(liked => liked.title !== podcast.title);
+      } else {
+        return [...prevLiked, podcast];
+      }
     });
   };
 
   const handleShare = () => {
     setIsShareModalOpen(true);
-    posthog.capture('share_modal_opened', { 
-      podcast_title: currentPodcast?.title, 
-      podcast_author: currentPodcast?.author 
-    });
   };
 
   const handleSettings = () => {
