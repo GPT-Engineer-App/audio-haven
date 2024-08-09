@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Search, Headphones, Star, Flag, Play, Pause, SkipBack, SkipForward, Share2, Settings, Volume2, VolumeX } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import posthog from 'posthog-js';
 
 const VolumeControl = ({ volume, setVolume }) => {
   const handleVolumeChange = (value) => {
@@ -30,7 +31,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { FacebookShareButton, TwitterShareButton, LinkedinShareButton } from 'react-share';
 
-const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite, isFavorite }) => {
+const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onLike, isLiked }) => {
   const handlePlay = () => {
     onPlay({ title, author, avatar, audioSrc });
     setTimeout(() => {
@@ -64,9 +65,9 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite
             <Play className="w-4 h-4 mr-1" />
             Play
           </Button>
-          <Button variant="outline" size="sm" onClick={onFavorite}>
-            <Star className={`w-4 h-4 mr-1 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
-            {isFavorite ? 'Favorited' : 'Favorite'}
+          <Button variant="outline" size="sm" onClick={onLike}>
+            <Star className={`w-4 h-4 mr-1 ${isLiked ? 'text-yellow-500 fill-yellow-500' : ''}`} />
+            {isLiked ? 'Liked' : 'Like'}
           </Button>
         </div>
       </div>
@@ -74,7 +75,7 @@ const PodcastCard = ({ title, author, tags, avatar, audioSrc, onPlay, onFavorite
   );
 };
 
-const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShare, onSettings, onPrevTrack, onNextTrack }) => {
+const PodcastPlayer = ({ currentPodcast, onClose, onLike, isLiked, onShare, onSettings, onPrevTrack, onNextTrack }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -236,8 +237,8 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
           />
         </div>
         <div className="flex items-center space-x-1">
-          <Button variant="ghost" size="sm" onClick={onFavorite} className="p-1 sm:p-2">
-            <Star className={`w-4 h-4 ${isFavorite ? 'text-yellow-500 fill-yellow-500' : ''}`} />
+          <Button variant="ghost" size="sm" onClick={onLike} className="p-1 sm:p-2">
+            <Star className={`w-4 h-4 ${isLiked ? 'text-yellow-500 fill-yellow-500' : ''}`} />
           </Button>
           <Button variant="ghost" size="sm" onClick={onShare} className="p-1 sm:p-2">
             <Share2 className="w-4 h-4" />
@@ -260,7 +261,7 @@ const PodcastPlayer = ({ currentPodcast, onClose, onFavorite, isFavorite, onShar
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPodcast, setCurrentPodcast] = useState(null);
-  const [favorites, setFavorites] = useState([]);
+  const [likedPodcasts, setLikedPodcasts] = useState([]);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [currentPodcastIndex, setCurrentPodcastIndex] = useState(0);
@@ -293,6 +294,7 @@ const Index = () => {
         audioPlayer.play();
       }
     }, 0);
+    posthog.capture('podcast_played', { podcast_title: podcast.title, podcast_author: podcast.author });
   };
 
   const handleTrackChange = (direction) => {
@@ -312,18 +314,29 @@ const Index = () => {
   const handlePrevTrack = () => handleTrackChange('prev');
   const handleNextTrack = () => handleTrackChange('next');
 
-  const handleFavorite = (podcast) => {
-    setFavorites(prevFavorites => {
-      if (prevFavorites.some(fav => fav.title === podcast.title)) {
-        return prevFavorites.filter(fav => fav.title !== podcast.title);
-      } else {
-        return [...prevFavorites, podcast];
-      }
+  const handleLike = (podcast) => {
+    setLikedPodcasts(prevLiked => {
+      const isLiked = prevLiked.some(liked => liked.title === podcast.title);
+      const newLikedPodcasts = isLiked
+        ? prevLiked.filter(liked => liked.title !== podcast.title)
+        : [...prevLiked, podcast];
+      
+      posthog.capture('podcast_like_toggled', { 
+        podcast_title: podcast.title, 
+        podcast_author: podcast.author,
+        action: isLiked ? 'unliked' : 'liked'
+      });
+      
+      return newLikedPodcasts;
     });
   };
 
   const handleShare = () => {
     setIsShareModalOpen(true);
+    posthog.capture('share_modal_opened', { 
+      podcast_title: currentPodcast?.title, 
+      podcast_author: currentPodcast?.author 
+    });
   };
 
   const handleSettings = () => {
@@ -355,8 +368,8 @@ const Index = () => {
                 key={index}
                 {...podcast}
                 onPlay={handlePlay}
-                onFavorite={() => handleFavorite(podcast)}
-                isFavorite={favorites.some(fav => fav.title === podcast.title)}
+                onLike={() => handleLike(podcast)}
+                isLiked={likedPodcasts.some(liked => liked.title === podcast.title)}
               />
             ))}
           </div>
@@ -370,8 +383,8 @@ const Index = () => {
                 key={index}
                 {...podcast}
                 onPlay={handlePlay}
-                onFavorite={() => handleFavorite(podcast)}
-                isFavorite={favorites.some(fav => fav.title === podcast.title)}
+                onLike={() => handleLike(podcast)}
+                isLiked={likedPodcasts.some(liked => liked.title === podcast.title)}
               />
             ))}
           </div>
@@ -391,8 +404,8 @@ const Index = () => {
         <PodcastPlayer
           currentPodcast={currentPodcast}
           onClose={handleClosePlayer}
-          onFavorite={() => handleFavorite(currentPodcast)}
-          isFavorite={favorites.some(fav => fav.title === currentPodcast.title)}
+          onLike={() => handleLike(currentPodcast)}
+          isLiked={likedPodcasts.some(liked => liked.title === currentPodcast.title)}
           onShare={handleShare}
           onSettings={handleSettings}
           onPrevTrack={handlePrevTrack}
