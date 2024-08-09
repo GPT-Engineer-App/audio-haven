@@ -393,7 +393,7 @@ const Index = () => {
         <div className="mb-6">
           <h2 className="text-2xl font-bold mb-4">Explore Topics</h2>
           <div className="flex flex-wrap gap-2">
-            {["Technology", "News", "Politics", "Science", "Education", "Comedy", "Entertainment"].map((topic, index) => (
+            {["Technology", "News", "Politics", "Science", "Education", "Comedy", "Entertainment", "Music"].map((topic, index) => (
               <Button key={index} variant="outline">#{topic}</Button>
             ))}
           </div>
