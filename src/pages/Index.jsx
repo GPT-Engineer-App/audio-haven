@@ -3,6 +3,7 @@ import { Search, Headphones, Star, Flag, Play, Pause, SkipBack, SkipForward, Sha
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import posthog from 'posthog-js';
+import posthog from 'posthog-js';
 
 const VolumeControl = ({ volume, setVolume }) => {
   const handleVolumeChange = (value) => {
